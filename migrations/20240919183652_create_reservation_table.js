@@ -2,28 +2,31 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
+export const up = function (knex) {
   return knex.schema.createTable("reservation", (table) => {
-    table.increments("reservation_id").primary();
+    table.increments("id").primary();
     table
       .integer("product_id")
       .notNullable()
       .unsigned()
-      .references("product.product_id")
+      .references("id")
+      .inTable("product")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     table
       .integer("user_id")
       .notNullable()
       .unsigned()
-      .references("user.user_id")
+      .references("id")
+      .inTable("user")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     table
       .integer("owner_id")
       .notNullable()
       .unsigned()
-      .references("user.user_id")
+      .references("id")
+      .inTable("user")
       .onUpdate("CASCADE")
       .onDelete("CASCADE");
     table.dateTime("reservation_start").defaultTo().notNullable();
@@ -39,6 +42,6 @@ exports.up = function (knex) {
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.down = function (knex) {
+export const down = function (knex) {
   return knex.schema.dropTable("reservation");
 };

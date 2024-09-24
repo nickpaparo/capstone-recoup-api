@@ -2,7 +2,7 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.seed = async function (knex) {
+export const seed = async function (knex) {
   await knex("user").del();
   await knex("user").insert([
     {
@@ -11,7 +11,7 @@ exports.seed = async function (knex) {
       last_name: "Watts",
       email: "Aaliyah23@hotmail.com",
       password: "F2EAFyTqHbR4Kt6",
-      created_at: ""
+      created_at: knex.fn.now()
     },
     {
       id: 2,
@@ -19,7 +19,7 @@ exports.seed = async function (knex) {
       last_name: "Volkman",
       email: "Haylie93@yahoo.com",
       password: "3jmembRtsuoo1tY",
-      created_at: ""
+      created_at: knex.fn.now()
     },
     {
       id: 3,
@@ -27,7 +27,7 @@ exports.seed = async function (knex) {
       last_name: "Jenkins",
       email: "Clid68@gmail.com",
       password: "kpHh_hKk6KMwvRa",
-      created_at: ""
+      created_at: knex.fn.now()
     },
   ]);
 };
