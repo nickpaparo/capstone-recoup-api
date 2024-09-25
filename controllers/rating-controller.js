@@ -2,10 +2,10 @@ import initKnex from "knex";
 import configuration from "../knexfile.js";
 const knex = initKnex(configuration);
 
-const newRating = async (req, res) => {
+const newProductRating = async (req, res) => {
   try {
-    const [newRatingId] = await knex("rating").insert(req.body);
-    const createdRating = await knex("rating").where({ id: newRatingId });
+    const [newRatingId] = await knex("user_rating").insert(req.body);
+    const [createdRating] = await knex("user_rating").where({ id: newRatingId });
     if (!createdRating) {
       return res
         .status(404)
@@ -17,4 +17,4 @@ const newRating = async (req, res) => {
   }
 };
 
-export { newRating };
+export { newProductRating };

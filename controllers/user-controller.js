@@ -2,6 +2,15 @@ import initKnex from "knex";
 import configuration from "../knexfile.js";
 const knex = initKnex(configuration);
 
+const getAllUsers = async (req, res) => {
+  try {
+    const allUsers = await knex("user");
+    res.status(200).json(allUsers);
+  } catch (error) {
+    res.status(400).send(`Unable to retrieve data`);
+  }
+};
+
 const getUser = async (req, res) => {
   try {
     const users = await knex("user").where({ id: req.params.id });
@@ -73,4 +82,87 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getUser, addUser, updateUser, deleteUser };
+const findUserReservations = async (req, res) => {
+  try {
+    const userReservations = await knex("user")
+      .join("reservation", "user.id", "reservation.user_id")
+      .where({ "user.id": req.params.id })
+      .select(
+        "reservation.id",
+        "reservation.product_id",
+        "reservation.user_id",
+        "reservation.owner_id",
+        "reservation.reservation_start",
+        "reservation.reservation_end"
+      );
+    if (userReservations.length === 0) {
+      res.status(404).send(`Unable to find data`);
+    }
+    res.status(200).json(userReservations);
+  } catch (error) {
+    res.status(400).json({ message: `Unable to retrieve data` });
+  }
+};
+
+const findOwnerReservations = async (req, res) => {
+  try {
+    const ownerReservations = await knex("user")
+      .join("reservation", "user.id", "reservation.owner_id")
+      .where({ "user.id": req.params.id })
+      .select(
+        "reservation.id",
+        "reservation.product_id",
+        "reservation.user_id",
+        "reservation.owner_id",
+        "reservation.reservation_start",
+        "reservation.reservation_end"
+      );
+    if (ownerReservations.length === 0) {
+      res.status(404).send(`Unable to find data`);
+    }
+    res.status(200).json(ownerReservations);
+  } catch (error) {
+    res.status(400).json({ message: `Unable to retrieve data` });
+  }
+};
+
+const findUserProduct = async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "User ID is required" });
+  }
+  try {
+    const user = await knex("user").where({ id: req.params.id }).first();
+    if (!user) {
+      return res.status(404).json({ message: `User not found in list of owners` });
+    }
+
+    const userProducts = await knex("product")
+      .where({ user_id: req.params.id })
+      .select(
+        "user_id",
+        "title",
+        "price_per_hour",
+        "price_per_day",
+        "is_available"
+      );
+    if (userProducts.length === 0) {
+      return res.status(404).json({
+        message: "There are no products associated with that user"
+      });
+    }
+    res.status(200).json(userProducts);
+  } catch (error) {
+    return res.status(500).send("Error occured while fetcing data");
+  }
+};
+
+export {
+  getAllUsers,
+  getUser,
+  addUser,
+  updateUser,
+  deleteUser,
+  findUserReservations,
+  findUserProduct,
+  findOwnerReservations,
+};

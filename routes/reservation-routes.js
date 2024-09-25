@@ -8,7 +8,4 @@ reservationRouter
   .get(reservationController.getOneReservation)
   .put(reservationController.updateReservation)
   .delete(reservationController.deleteReservation);
-reservationRouter
-  .route("/:id/rentals")
-  .get(reservationController.findUserReservations);
 export default reservationRouter;
