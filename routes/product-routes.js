@@ -10,11 +10,12 @@ productRouter
 productRouter
   .route("/:id")
   .get(productController.getOneProduct)
-  .put(productController.updateProduct)
-  .delete(productController.deleteProduct);
+  .put(productController.updateProduct);
 productRouter
   .route("/:id/rating")
   .get(productController.findProductRating)
   .post(ratingController.newProductRating);
+productRouter.route("/search").get(productController.searchProducts);
+productRouter.route("/delete").post(productController.deleteProduct);
 
 export default productRouter;

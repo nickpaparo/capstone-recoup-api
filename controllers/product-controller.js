@@ -1,5 +1,6 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
+import { v4 as uuidv4 } from "uuid";
 const knex = initKnex(configuration);
 
 const getProducts = async (_req, res) => {
@@ -14,9 +15,9 @@ const getProducts = async (_req, res) => {
 const getOneProduct = async (req, res) => {
   try {
     const products = await knex("product").where({ id: req.params.id });
-    if (products.length === 0) {
-      res.status(404).json({ message: `Product not found` });
-    }
+    // if (products.length === 0) {
+    //   return res.status(404).json({ message: `Product not found` });
+    // }
     const product = products[0];
     res.status(200).json(product);
   } catch (error) {
@@ -25,7 +26,8 @@ const getOneProduct = async (req, res) => {
 };
 
 const validatePrice = (price) => {
-  return typeof price === "number" && price >= 0;
+  const numPrice = Number(price);
+  return !isNaN(numPrice) && numPrice >= 0;
 };
 
 const newProduct = async (req, res) => {
@@ -33,25 +35,31 @@ const newProduct = async (req, res) => {
     if (
       !req.body.user_id ||
       !req.body.title ||
-      !req.body.price_per_hour ||
-      !req.body.price_per_day
+      req.body.price_per_hour === undefined ||
+      req.body.price_per_day === undefined
     ) {
       return res
         .status(400)
         .json({ message: `Please fill out all fields to list a new product` });
     }
 
-    if (
-      !validatePrice(req.body.price_per_day) ||
-      !validatePrice(req.body.price_per_hour)
-    ) {
+    const price_per_hour = Number(req.body.price_per_hour);
+    const price_per_day = Number(req.body.price_per_day);
+
+    if (!validatePrice(price_per_day) || !validatePrice(price_per_hour)) {
       return res.status(400).json({ message: `Invalid price` });
     }
-
-    const { id, ...productData } = req.body;
-    productData.price_per_hour = parseFloat(productData.price_per_hour);
-    productData.price_per_day = parseFloat(productData.price_per_day);
-
+    const id = uuidv4();
+    const productData = {
+      id,
+      user_id: req.body.user_id,
+      title: req.body.title,
+      description: req.body.description,
+      price_per_hour: parseFloat(price_per_hour),
+      price_per_day: parseFloat(price_per_day),
+      is_available: req.body.is_available || true,
+    };
+    console.error({ message: "Product Data", product: productData });
     const [newProductId] = await knex("product").insert(productData);
     const createdProduct = await knex("product")
       .where({ id: newProductId })
@@ -62,8 +70,13 @@ const newProduct = async (req, res) => {
         .status(404)
         .json({ message: `Product not found after creation` });
     }
-    return res.status(201).json(createdProduct);
+    console.log(createdProduct);
+    return res.status(201).json({
+      message: "Successfully created product",
+      product: createdProduct,
+    });
   } catch (error) {
+    console.error("Error creating new product:", error);
     res.status(500).json({ message: `Unable to create new product listing` });
   }
 };
@@ -94,7 +107,7 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const productId = req.params.id;
+  const productId = req.body.id;
   if (!productId) {
     return res.status(404).json({ message: `Unable to perform function` });
   }
@@ -131,6 +144,36 @@ const findProductRating = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  const searchQuery = req.query.searchQuery;
+  if (searchQuery === undefined || searchQuery.trim() === "") {
+    return res.status(400).json({ message: "Search to see results" });
+  }
+  console.log("Search Query:", searchQuery);
+  try {
+    const results = await knex("product")
+      .select("*")
+      .where(function () {
+        this.where("title", "like", `%${searchQuery}%`)
+          .orWhere("description", "like", `%${searchQuery}%`)
+          .orWhereRaw("LOWER(title) LIKE ?", [`%${searchQuery.toLowerCase()}%`])
+          .orWhereRaw("LOWER(description) LIKE ?", [
+            `%${searchQuery.toLowerCase()}%`,
+          ]);
+      });
+    if (results.length === 0) {
+      return res.status(200).json({ message: "No products found" });
+    }
+    console.log("Search Results:", results);
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Error retrieving products", error);
+    return res
+      .status(500)
+      .json({ message: "Error retrieving products", error });
+  }
+};
+
 export {
   getProducts,
   getOneProduct,
@@ -138,4 +181,5 @@ export {
   updateProduct,
   deleteProduct,
   findProductRating,
+  searchProducts,
 };

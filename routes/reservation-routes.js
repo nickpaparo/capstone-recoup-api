@@ -8,4 +8,8 @@ reservationRouter
   .get(reservationController.getOneReservation)
   .put(reservationController.updateReservation)
   .delete(reservationController.deleteReservation);
+reservationRouter
+  .route("/:id/product")
+  .get(reservationController.findProductReservation);
+reservationRouter.route("/delete").post(reservationController.deleteReservation);
 export default reservationRouter;
