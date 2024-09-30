@@ -209,7 +209,8 @@ const findUserProduct = async (req, res) => {
         "description",
         "price_per_hour",
         "price_per_day",
-        "is_available"
+        "is_available",
+        "image"
       );
     res.status(200).json(userProducts);
   } catch (error) {

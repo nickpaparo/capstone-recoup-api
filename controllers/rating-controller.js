@@ -10,7 +10,7 @@ const calcAverageRating = async (productId) => {
     return 0;
   }
   const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
-  return sum / ratings.length;
+  return (sum / ratings.length).toFixed(1);
 };
 
 const newProductRating = async (req, res) => {

@@ -3,6 +3,17 @@ import configuration from "../knexfile.js";
 import { v4 as uuidv4 } from "uuid";
 const knex = initKnex(configuration);
 
+const calcAverageRating = async (productId) => {
+  const ratings = await knex("user_rating")
+    .where({ product_id: productId })
+    .select("rating");
+  if (ratings.length === 0) {
+    return 0;
+  }
+  const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
+  return (sum / ratings.length).toFixed(1);
+};
+
 const getProducts = async (_req, res) => {
   try {
     const products = await knex("product");
@@ -128,19 +139,11 @@ const deleteProduct = async (req, res) => {
 
 const findProductRating = async (req, res) => {
   try {
-    const productRating = await knex("user_rating")
-      .join("product", "user_rating.product_id", "product.id")
-      .where({ product_id: req.params.id })
-      .select("product.id", "user_rating.rating as product_rating");
-    if (productRating.length === 0) {
-      res
-        .status(404)
-        .json({ message: `There are no ratings for this product` });
-    } else {
-      res.status(200).json(productRating);
-    }
+    const productId = req.params.id;
+    const averageRating = await calcAverageRating(productId);
+    res.status(200).json({ product_rating: averageRating });
   } catch (error) {
-    res.status(404).send(`Error finding product ratings`);
+    res.status(500).send(`Error finding product ratings: ${error.message}`);
   }
 };
 
