@@ -7,6 +7,8 @@ productRouter
   .route("/")
   .get(productController.getProducts)
   .post(productController.newProduct);
+productRouter.route("/search").get(productController.searchProducts);
+productRouter.route("/delete").post(productController.deleteProduct);
 productRouter
   .route("/:id")
   .get(productController.getOneProduct)
@@ -15,7 +17,5 @@ productRouter
   .route("/:id/rating")
   .get(productController.findProductRating)
   .post(ratingController.newProductRating);
-productRouter.route("/search").get(productController.searchProducts);
-productRouter.route("/delete").post(productController.deleteProduct);
 
 export default productRouter;

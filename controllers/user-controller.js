@@ -170,6 +170,7 @@ const findOwnerReservations = async (req, res) => {
   try {
     const ownerReservations = await knex("user")
       .join("reservation", "user.id", "reservation.owner_id")
+      .join("product", "reservation.product_id", "product.id")
       .where({ "user.id": req.params.id })
       .select(
         "reservation.id",
@@ -177,7 +178,15 @@ const findOwnerReservations = async (req, res) => {
         "reservation.user_id",
         "reservation.owner_id",
         "reservation.reservation_start",
-        "reservation.reservation_end"
+        "reservation.reservation_end",
+        "reservation.duration_days",
+        "reservation.duration_hrs",
+        "reservation.total_price",
+        "product.title as product_title",
+        "product.image as product_image",
+        "product.is_available as product_availability",
+        "product.price_per_day as product_price_per_day",
+        "product.price_per_hour as product_price_per_hour",
       );
     if (ownerReservations.length === 0) {
       res.status(404).send(`Unable to find data`);

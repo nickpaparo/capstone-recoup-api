@@ -156,61 +156,6 @@ const newReservation = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: `Unable to reserve product`, error });
   }
-  // const reservationStartDatetime = convertToMySQLDatetime(
-  //   req.body.reservation_start
-  // );
-  // const reservationEndDatetime = convertToMySQLDatetime(
-  //   req.body.reservation_end
-  // );
-
-  // try {
-  // if (
-  //   !req.body.product_id ||
-  //   !req.body.user_id ||
-  //   !req.body.owner_id ||
-  //   !reservationStartDatetime ||
-  //   !reservationEndDatetime
-  // ) {
-  //   return res.status(400).json({
-  //     message: `Missing required fields. Unable to complete reservation.`,
-  //   });
-  // }
-  // if (!validateRental(reservationStartDatetime, reservationEndDatetime)) {
-  //   return res.status(400).json({
-  //     message: `Invalid reservation times. The end time must be after the start time.`,
-  //   });
-  // }
-
-  // const durationMins = new Date(reservationEndDatetime) - new Date(reservationStartDatetime);
-  // const durationHrs = Math.floor(durationMins / (1000 * 60 * 60));
-  // const durationDays = Math.floor(durationHrs / 24);
-  // const remainingHrs = durationHrs % 24;
-
-  // console.log("start", reservationStartDatetime, "end", reservationEndDatetime)
-  // const reservationData = {
-  //   id: uuidv4(),
-  //   product_id: req.body.product_id,
-  //   user_id: req.body.user_id,
-  //   owner_id: req.body.owner_id,
-  //   total_price: req.body.total_price,
-  //   reservation_start: reservationStartDatetime,
-  //   reservation_end: reservationEndDatetime,
-  //   duration_days: durationDays,
-  //   duration_hrs: remainingHrs,
-  // };
-  // console.log(durationDays, remainingHrs)
-  // console.log(reservationData)
-  // const [newReservationId] = await knex("reservation").insert(reservationData);
-  // const createdReservation = await knex("reservation")
-  //   .where({ id: newReservationId })
-  //   .first();
-  // if (!createdReservation) {
-  //   return res.status(404).json({ message: `Data not found after creation` });
-  // }
-  // res.status(201).json(createdReservation);
-  // } catch (error) {
-  //   // res.status(500).json({ message: `Unable to reserve product`, error });
-  // }
 };
 
 const updateReservation = async (req, res) => {

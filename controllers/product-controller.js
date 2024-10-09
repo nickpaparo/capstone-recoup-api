@@ -10,8 +10,10 @@ const calcAverageRating = async (productId) => {
   if (ratings.length === 0) {
     return 0;
   }
-  const sum = ratings.reduce((acc, curr) => acc + curr.rating, 0);
-  return (sum / ratings.length).toFixed(1);
+  const sum = ratings.reduce((acc, curr) => acc + parseFloat(curr.rating), 0);
+  const average = sum / ratings.length;
+  
+  return Number(average.toFixed(1));
 };
 
 const getProducts = async (_req, res) => {
@@ -69,6 +71,9 @@ const newProduct = async (req, res) => {
       price_per_hour: parseFloat(price_per_hour),
       price_per_day: parseFloat(price_per_day),
       is_available: req.body.is_available || true,
+      image: req.body.imageUrl,
+      address: req.body.address,
+      zipcode: req.body.zipcode
     };
     console.error({ message: "Product Data", product: productData });
     const [newProductId] = await knex("product").insert(productData);
@@ -113,7 +118,7 @@ const updateProduct = async (req, res) => {
       .first();
     res.status(200).json(updatedProduct);
   } catch (error) {
-    res.status(500).json({ message: `Unable to update product` });
+    res.status(500).json({ message: `Unable to update product`, error });
   }
 };
 
@@ -165,7 +170,7 @@ const searchProducts = async (req, res) => {
           ]);
       });
     if (results.length === 0) {
-      return res.status(200).json({ message: "No products found" });
+      return res.status(404).json({ message: "No products found" });
     }
     console.log("Search Results:", results);
     return res.status(200).json(results);
