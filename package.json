@@ -8,7 +8,8 @@
     "migrate": "knex migrate:latest",
     "migrate:down": "knex migrate:down",
     "migrate:rollback": "knex migrate:rollback",
-    "seed": "knex seed:run"
+    "seed": "knex seed:run",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +22,7 @@
     "knex": "^3.1.0",
     "mysql-server": "^1.0.5",
     "mysql2": "^3.11.3",
-    "node": "^22.9.0",
+    "node": "^22.13.1",
     "uuid": "^10.0.0"
   }
 }
